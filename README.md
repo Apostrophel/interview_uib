@@ -39,6 +39,8 @@ npy-matlab
 
 5. Use the final resulting .dat file in Elmer/Ice (Check if the dat-file works with *enth_output.sif*).
 
+### Additional files (UiB Note)
+A few supplementary scripts are included (they are not needed for the example to work), as well as two example output files. Located in the folder *additional_files*. 
 
 ### Additional Notes (For further use in Elmer/Ice)
 
