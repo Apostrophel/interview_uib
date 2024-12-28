@@ -36,7 +36,7 @@ path_dem_domain = "sampled_domain_20m_clean.csv"     #250x500 = 125 000 points. 
 path_output = "veafjorden_topography_r20_8k_4k_shift.npy"
 
 #Show or hide visual plot outputs during processing:
-show_plots = False          
+show_plots = True          
 
 # Functions:
 def get_middle_profile_vector(my_matrix):

@@ -3,8 +3,20 @@ Author: sjurbarndon@proton.me
 
 These scripts handle .tif and .scv datasets and ultimately outputs a .dat file for use with Elmer/Ice. The scripts process raw elevation data from QGIS, after creating a complete raster of the domain saved in a .tif file. Rotation might be required before processing to align the domain with the ice flow direction.
 
-**Note**: For the interview I included a .scv file (**sampled_domain_20m_clean.scv**) that is ready for step 3 below.
+**UiB Note**: For the interview I included a .scv file (**sampled_domain_20m_clean.scv**) that is ready for step 3 below.
 
+### Dependencies
+
+##### For python:
+Pandas (pip install pandas)
+Numpy
+scipy.ndimage
+matplotlib.pyplot
+
+##### For MATLAB:
+npy-matlab 
+&emsp;(git clone https://github.com/kwikteam/npy-matlab.git)
+&emsp;unzip and: `addpath('my-idiosyncratic-path/npy-matlab/npy-matlab')` for use in matlab scripts. **UiB Note**: update path in MATLAB script. 
 
 ### Script List
 1. **dem_conversion_taper_xy.py**&emsp;(For UiB interview)
@@ -13,8 +25,6 @@ These scripts handle .tif and .scv datasets and ultimately outputs a .dat file f
 4. rotate_tif_files.py
 
 ### Steps
- 
-
 1. <span style="color:grey">Find the angle of rotation (...by guessing) and run the script rotate_tif_files.py specifying the angle as rotation angle.</span>
 
 2. <span style="color:grey">Open the new, rotated raster in QGIS for sampling and export the data as a .csv file:</span> 

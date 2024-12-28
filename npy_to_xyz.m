@@ -13,12 +13,17 @@ res = 20; %(m) x and y resolution
 d_x = 401*res; %(m) total length of domain (xnodes * res)
 d_y = 201*res; %(m) total width of domain  (ynodes * res)
 
+% Change working directory to script location
+currentScriptPath = mfilename('fullpath');
+[currentScriptDir, ~, ~] = fileparts(currentScriptPath);
+cd(currentScriptDir);
+
 % Add .npy reader
-addpath('libraries/npy-matlab/npy-matlab');
+addpath('/home/sjur/Documents/gitrepos/npy-matlab/npy-matlab');
 
 % Load .npy to matlab array
-DEM = readNPY('veafjorden_topography_r20_8k_4k_shift_g25.npy');
-filename_save = 'veafjorden_8k_4k_d2000_shift_g25.dat';
+DEM = readNPY('veafjorden_topography_r20_8k_4k_shift.npy');
+filename_save = 'veafjorden_8k_4k_d2000_shift.dat';
 
 size(DEM)
 DEM = DEM - depth;
@@ -58,7 +63,6 @@ out = out(~all(out == [0 0 0], 2), :);
 
 
 %_______________________TESTING____________________________________________________
-
 fprintf('\nCheck first 10 lines: \n');
 fprintf('%f %f %f\n', out(1:10, :)');
 relief;
