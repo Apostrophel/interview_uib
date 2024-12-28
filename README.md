@@ -8,14 +8,14 @@ These scripts handle .tif and .scv datasets and ultimately outputs a .dat file f
 ### Dependencies
 
 ##### For python:
-Pandas (pip install pandas)
-Numpy
-scipy.ndimage
-matplotlib.pyplot
+- Pandas (pip install pandas)
+- Numpy
+- scipy.ndimage
+- matplotlib.pyplot
 
 ##### For MATLAB:
-npy-matlab 
-&emsp;(git clone https://github.com/kwikteam/npy-matlab.git)
+- npy-matlab (git clone https://github.com/kwikteam/npy-matlab.git) 
+
 &emsp;unzip and: `addpath('my-idiosyncratic-path/npy-matlab/npy-matlab')` for use in matlab scripts. **UiB Note**: update path in MATLAB script. 
 
 ### Script List
