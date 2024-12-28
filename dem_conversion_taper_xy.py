@@ -74,7 +74,7 @@ def hillshade(array,azimuth,angle_altitude):
 
 def check_equal_boundaries(dem):
     """
-    
+    Compares the boundaries of the DEM to check if the elevation is matching.
     """
 
     n = 20  #number of output lines (for debugging)
@@ -89,6 +89,7 @@ def check_equal_boundaries(dem):
     bottom_edge = dem[-1, :]
     top_bottom_equal = np.array_equal(top_edge, bottom_edge)
 
+    # Print outputs for quick testing
     if left_right_equal:
         print("\nLeft and right sides of the DEM are equal.")
         #for l, r in zip(left_side[:n], right_side[:n]):
@@ -111,7 +112,11 @@ def check_equal_boundaries(dem):
                 print(t, " =/= ", b )
     
     return left_right_equal, top_bottom_equal
+
 def check_equal_boundaries_visual(dem):
+    """
+    Visual representation of boundary check. Used for debugging boundary differences.
+    """
     col_1 = dem[:,:2]
     col_n = dem[:,-2:]
     plt.imshow(np.block([col_n, col_1]), aspect="auto")
@@ -169,10 +174,11 @@ print("-----------------------------------------------------")
 actual_input_resolution = 20
 #cut_n = int(cut_m/actual_input_resolution)    # Number of data points or nodes to cut from each side (num of rows and columns)
 
-# number of nodes to remove from each side of domain:
+# Number of nodes to remove from each side of domain:
 cut_n_x = 100
 cut_n_y = 50
 
+# Compare new size and update DEM
 print("CUT x:", cut_n_x , "\nCUT y:", cut_n_y)
 print("\nSize: ", DEM.size, " shape: ", DEM.shape)
 DEM = DEM[cut_n_y:-cut_n_y , cut_n_x:-cut_n_x]   
@@ -181,15 +187,11 @@ print("Size: ", DEM.size, "  shape: ", DEM.shape)
 original_domain_size_x = (x_in_orig - cut_n_x*2)*actual_input_resolution
 original_domain_size_y = (y_in_orig - cut_n_y*2)*actual_input_resolution
 
-
-#x_in_orig = 500 
-#y_in_orig = 250
 taper_length = 50                   #(m) new taper width
 taper_height = 25                   #(m) new taper hight of y-direction taper
 
 
-
-# Create taper DEM
+# Create taper and add to DEM
 left_block = np.fliplr(DEM[:, :taper_length])               #Duplicates and flips a block (l) with the width of taper_length
 right_block = np.fliplr(DEM[:, -taper_length:])             #Duplicates and flips a block (r) with the width of taper_length
 
@@ -197,17 +199,16 @@ DEM_out = np.hstack((left_block, DEM, right_block))         #Stacks the blocks o
 plt.imshow(DEM_out)
 if show_plots: plt.show()
 
-
 taper_DEM_area = np.block([
     DEM_out[:,-int(taper_length/resolution):], 
     DEM_out, 
     DEM_out[:,0:int(taper_length/resolution)]
 ])
 
+# Show the taper area
 plt.imshow(taper_DEM_area)
 plt.title("First stack fin")
 if show_plots: plt.show()
-
 
 # Obtain taper windows 
 window_start = [
@@ -224,7 +225,7 @@ for yy in range(np.shape(DEM_out)[0]):
         DEM_out[yy,xx] = np.mean(taper_DEM_area[yy,mean_ind])
 
 
-#flip and run loop again
+# Flip and run loop again
 DEM_out = np.fliplr(DEM_out)
 taper_DEM_area = np.fliplr(taper_DEM_area)
 
@@ -237,11 +238,12 @@ for yy in range(np.shape(DEM_out)[0]):
         mean_ind = [int(ii) for ii in mean_ind]
         DEM_out[yy,xx] = np.mean(taper_DEM_area[yy,mean_ind])
 
-#flip back
+# Flip back
 DEM_out = np.fliplr(DEM_out)
 taper_DEM_area = np.fliplr(taper_DEM_area)
 
 
+# Show taper area DEM comparison
 plt.subplot(2,1,1)
 plt.imshow(DEM_out)
 plt.title("LR-Tapered DEM")
@@ -250,11 +252,10 @@ plt.imshow(DEM)
 plt.title("Old DEM")
 if show_plots: plt.show()
 
-#Move x-dir taper section to down-slope side of domain:
+# Move x-dir taper section to down-slope side of domain:
 DEM_out = np.hstack((DEM_out[:, taper_length:], DEM_out[:, :taper_length]))
 
-#Taper in y-direction:
-
+# Taper in y-direction:
 upper_block = np.flipud(DEM_out[:taper_height, :])             #Duplicates and flips a block (l) with the width of taper_length
 lower_block = np.flipud(DEM_out[-taper_height:, :])            #Duplicates and flips a block (r) with the width of taper_length
 
@@ -262,7 +263,7 @@ DEM_out_vertical = np.vstack((upper_block, DEM_out, lower_block))         #Stack
 plt.imshow(DEM_out_vertical)
 if show_plots: plt.show()
 
-#add extra taper length blocks for smoothing:
+# Add extra taper length blocks for smoothing:
 taper_DEM_area_vertical = np.vstack((lower_block, DEM_out_vertical, upper_block))         #Stacks the blocks on the top/bottom of the DEM again
 plt.imshow(taper_DEM_area_vertical)
 plt.title("Vertical taper stack")
@@ -296,11 +297,11 @@ for xx in range(np.shape(DEM_out_vertical)[1]):
         mean_ind = [int(ii) for ii in mean_ind]
         DEM_out_vertical[yy, xx] = np.mean(taper_DEM_area_vertical[mean_ind, xx])
 
-#flip back
+# Flip back
 DEM_out_vertical = np.flipud(DEM_out_vertical)
 taper_DEM_area_vertical = np.flipud(taper_DEM_area_vertical)
 
-#Move y-dir taper section to down-slope side of domain:
+# Move y-dir taper section to down-slope side of domain:
 DEM_out_vertical = np.vstack((DEM_out_vertical[taper_height:, :], DEM_out_vertical[:taper_height, :]))
 
 plt.imshow(DEM_out_vertical)
@@ -312,12 +313,13 @@ check_equal_boundaries(DEM_out_vertical)
 # -----------------------------------------------------------------------------------------------------------------------
 # Gaussian filter:
 
-
 DEM_out = DEM_out_vertical
 
 # Stacking 3x3 grid of DEM together, for best periodic gaussian application:
 DEM_out3 = np.block([DEM_out, DEM_out, DEM_out]) # Stack 3 next to each other 
 DEM_out3x3 = np.vstack([DEM_out3, DEM_out3, DEM_out3]) # Stack 3 on top of each other
+
+# Show 3x3 grid plot
 plt.imshow(DEM_out3x3)
 plt.title("DEM 3x3 STACK")
 if show_plots: plt.show()
@@ -331,7 +333,7 @@ plt.imshow(DEM_g_center)
 plt.title("CENTER of gaussion filetered DEM")
 if show_plots: plt.show()
 
-#check boundary
+# Check boundary
 check_equal_boundaries_visual(DEM_g)
 
 # Compare before and after Gaussian filter:
@@ -339,10 +341,11 @@ print("----------------Gaussian filter applied ---------------")
 print("Shape (gaus): ", np.shape(DEM_g))
 print("Shape (old): ", np.shape(DEM_out))
 
-
 relief_final = abs(np.min(DEM_g)-np.max(DEM_g))
 
-
+##############################################################
+################# Plot results and final DEM #################
+##############################################################
 
 plt.subplot(2,1,1)
 plt.imshow(DEM_g, cmap='terrain')
@@ -372,7 +375,7 @@ DEM_hs = hillshade(DEM_g, 125, 45)
 x_gradient = np.gradient(DEM_g)[0]
 y_gradient = np.gradient(DEM_g)[1]
       
-#plots
+# Plots
 fig, ax1 = plt.subplots(3,1)
 
 im = ax1[0].imshow(DEM_g, cmap='terrain') 
@@ -398,7 +401,7 @@ ax1[2].set_ylabel("Across flow (m)")
 if show_plots: plt.show() 
 
 
-#final check boundary
+# Final check boundary
 print("\nPERIODICITY TEST: ")
 left_right, top_bottom = check_equal_boundaries(DEM_g)
 if left_right and top_bottom:
