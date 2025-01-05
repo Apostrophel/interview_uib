@@ -19,6 +19,8 @@ import numpy as np
 import pandas as pd
 import scipy.ndimage as ndimage
 import matplotlib.pyplot as plt
+import rasterio
+from rasterio.transform import from_origin
 
 # Set python directory:
 os.chdir(os.path.dirname(sys.argv[0]))
@@ -255,6 +257,8 @@ if show_plots: plt.show()
 # Move x-dir taper section to down-slope side of domain:
 DEM_out = np.hstack((DEM_out[:, taper_length:], DEM_out[:, :taper_length]))
 
+DEM_out = np.flipud(DEM_out)
+
 # Taper in y-direction:
 upper_block = np.flipud(DEM_out[:taper_height, :])             #Duplicates and flips a block (l) with the width of taper_length
 lower_block = np.flipud(DEM_out[-taper_height:, :])            #Duplicates and flips a block (r) with the width of taper_length
@@ -351,11 +355,28 @@ plt.subplot(2,1,1)
 plt.imshow(DEM_g, cmap='terrain')
 plt.colorbar() 
 plt.title("Gaussian filter applied")
+
 plt.subplot(2,1,2)
 plt.imshow(DEM_out, cmap='terrain')
 plt.colorbar()
 plt.title(" Older DEM ")
-if show_plots: plt.show()
+plt.show()
+
+######## OUTPUT A TERRAIN MODEL FOR PRESENTATON ##########
+
+figure_DEM = np.fliplr(DEM_g)
+
+plt.imshow(figure_DEM, cmap='terrain')
+plt.title("Processed Veafjorden DEM")
+plt.savefig('processed_veafjorden_dem.png', dpi=300)   
+
+hs_Figure_DEM = hillshade(figure_DEM, 315, 50)
+plt.imshow(hs_Figure_DEM, cmap='grey')
+plt.title("Processed Veafjorden Hillshade")
+plt.savefig('processed_veafjorden_hs.png', dpi=300)   
+plt.show()
+
+###########################################################
 
 # Plot profile through the middle of domain: 
 mid_g = get_middle_profile_vector(DEM_g)
